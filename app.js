@@ -18,6 +18,7 @@ window.saveToCloud = GOOGLE_SCRIPT_URL ? async function(card) {
   const body = new URLSearchParams({
     id: card.id,
     rating: String(card.rating),
+    wineName: card.wineName,
     broughtBy: card.broughtBy,
     goesWith: card.goesWith,
     descriptors: card.descriptors.join(", "),
@@ -72,19 +73,23 @@ function renderLocalCards() {
     savedCards.innerHTML = '<div class="empty">No cards saved on this device yet.</div>';
     return;
   }
-  savedCards.innerHTML = cards.slice().reverse().map(card => `
-    <article class="saved-item">
-      <div class="saved-title">
-        <span>${escapeHtml(card.broughtBy)}</span>
-        <span>${"🍷".repeat(card.rating)}</span>
-      </div>
-      <div class="saved-meta">
-        ${card.goesWith ? `Goes with: ${escapeHtml(card.goesWith)}<br>` : ""}
-        ${card.descriptors.length ? `Style: ${card.descriptors.map(escapeHtml).join(", ")}` : ""}
-      </div>
-      ${card.notes ? `<div class="saved-notes">${escapeHtml(card.notes)}</div>` : ""}
-    </article>
-  `).join("");
+  savedCards.innerHTML = cards.slice().reverse().map(card => {
+    const wineName = card.wineName || card.broughtBy || "Untitled wine";
+    return `
+      <article class="saved-item">
+        <div class="saved-title">
+          <span>${escapeHtml(wineName)}</span>
+          <span>${"🍷".repeat(card.rating)}</span>
+        </div>
+        <div class="saved-meta">
+          ${card.broughtBy ? `Brought by: ${escapeHtml(card.broughtBy)}<br>` : ""}
+          ${card.goesWith ? `Goes with: ${escapeHtml(card.goesWith)}<br>` : ""}
+          ${card.descriptors.length ? `Style: ${card.descriptors.map(escapeHtml).join(", ")}` : ""}
+        </div>
+        ${card.notes ? `<div class="saved-notes">${escapeHtml(card.notes)}</div>` : ""}
+      </article>
+    `;
+  }).join("");
 }
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, c => ({
@@ -102,6 +107,7 @@ form.addEventListener("submit", async event => {
   const card = {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     rating: Number(ratingValue.value),
+    wineName: document.getElementById("wineName").value.trim(),
     broughtBy: document.getElementById("broughtBy").value.trim(),
     goesWith: document.getElementById("goesWith").value.trim(),
     descriptors: [...document.querySelectorAll(".chip.selected")].map(x => x.dataset.value),
