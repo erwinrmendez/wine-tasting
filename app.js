@@ -55,6 +55,7 @@ const usernameTagWrap = document.getElementById("usernameTagWrap");
 const setUsernameButton = document.getElementById("setUsername");
 const editUsernameButton = document.getElementById("editUsername");
 let editingCardId = null;
+let editingUsername = false;
 
 DESCRIPTORS.forEach(text => {
   const button = document.createElement("button");
@@ -96,10 +97,10 @@ function setSessionUsername(value) {
 }
 function renderUsernameState() {
   const username = getSessionUsername();
-  const showPrompt = !username;
-  form.hidden = !username;
+  const showPrompt = !username || editingUsername;
+  form.hidden = !username || editingUsername;
   usernamePrompt.hidden = !showPrompt;
-  usernameTagWrap.hidden = showPrompt;
+  usernameTagWrap.hidden = !username || editingUsername;
   if (username) {
     usernameTag.textContent = `@${username}`;
   }
@@ -342,6 +343,7 @@ setUsernameButton.addEventListener("click", () => {
     status.textContent = "Enter a username to start saving cards.";
     return;
   }
+  editingUsername = false;
   status.textContent = `Username set to ${username} ✓`;
   renderUsernameState();
   usernameInput.value = "";
@@ -357,10 +359,8 @@ usernameInput.addEventListener("keydown", event => {
 editUsernameButton.addEventListener("click", () => {
   const username = getSessionUsername();
   usernameInput.value = username;
-  form.hidden = true;
+  editingUsername = true;
   renderUsernameState();
-  usernamePrompt.hidden = false;
-  usernameTagWrap.hidden = true;
   usernameInput.focus();
 });
 
@@ -375,4 +375,5 @@ clearLocal.addEventListener("click", () => {
   }
 });
 
+renderUsernameState();
 renderLocalCards();
