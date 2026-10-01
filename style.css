@@ -77,5 +77,20 @@ select { appearance:none; }
   padding:8px 12px; font:inherit; font-size:.8rem; color:var(--text); cursor:pointer;
 }
 .saved-action.danger { color:var(--accent); }
+.summary-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;
+  margin-top:10px;
+}
+.summary-item {
+  background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px;
+}
+.summary-label { color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.08em; }
+.summary-value { font-weight:800; font-size:1.2rem; margin:8px 0 4px; }
+.summary-subtle { color:var(--muted); font-size:.78rem; }
+.leaderboard { margin-top:16px; }
+.leaderboard-row {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; padding:8px 0; border-top:1px solid var(--border);
+}
 .empty { color:var(--muted); font-size:.88rem; padding-top:4px; }
 @media (min-width: 600px) { .app { padding-top:42px; } }
