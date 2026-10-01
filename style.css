@@ -25,12 +25,13 @@ header p { margin:0; color:var(--muted); }
 }
 .section-label { display:block; font-weight:750; font-size:.94rem; margin-bottom:10px; }
 .hint { margin:-5px 0 12px; color:var(--muted); font-size:.82rem; }
-input, textarea {
+input, textarea, select {
   width:100%; border:1px solid var(--border); border-radius:13px; background:#fff;
   padding:14px; font:inherit; color:var(--text); outline:none;
 }
-input:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+input:focus, textarea:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
 textarea { resize:vertical; min-height:110px; }
+select { appearance:none; }
 .glasses { display:flex; gap:7px; }
 .glass {
   appearance:none; border:0; background:transparent; font-size:2.15rem;
@@ -53,6 +54,9 @@ textarea { resize:vertical; min-height:110px; }
 .status { min-height:22px; text-align:center; color:var(--muted); font-size:.85rem; }
 .saved-head { display:flex; align-items:center; justify-content:space-between; }
 .text-button { border:0; background:none; color:var(--accent); font:inherit; cursor:pointer; }
+.saved-toolbar { display:flex; align-items:center; gap:10px; margin:10px 0 8px; }
+.saved-toolbar .section-label { margin:0; }
+.saved-toolbar select { max-width:180px; }
 .saved-item {
   border-top:1px solid var(--border); padding:14px 0 4px; margin-top:10px;
 }
@@ -60,5 +64,11 @@ textarea { resize:vertical; min-height:110px; }
 .saved-title { display:flex; justify-content:space-between; gap:12px; font-weight:750; }
 .saved-meta { color:var(--muted); font-size:.82rem; margin-top:4px; line-height:1.45; }
 .saved-notes { margin-top:8px; font-size:.9rem; white-space:pre-wrap; }
+.saved-actions { display:flex; gap:8px; margin-top:12px; }
+.saved-action {
+  border:1px solid var(--border); background:#fff; border-radius:10px;
+  padding:8px 12px; font:inherit; font-size:.8rem; color:var(--text); cursor:pointer;
+}
+.saved-action.danger { color:var(--accent); }
 .empty { color:var(--muted); font-size:.88rem; padding-top:4px; }
 @media (min-width: 600px) { .app { padding-top:42px; } }
