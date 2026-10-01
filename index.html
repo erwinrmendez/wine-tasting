@@ -14,7 +14,7 @@
       <p>Rate it, describe it, and save your notes.</p>
     </header>
 
-    <form id="wineForm" autocomplete="off">
+    <form id="wineForm" autocomplete="off" hidden>
       <section class="card">
         <label class="section-label">Rating</label>
         <div class="glasses" id="rating" role="radiogroup" aria-label="Wine rating">
@@ -30,8 +30,8 @@
       <section class="card" id="usernameSection">
         <label class="section-label">Username</label>
         <div id="usernamePrompt" class="username-prompt">
-          <input id="username" name="username" placeholder="Your name / username">
-          <button id="setUsername" class="mini-button" type="button">Use username</button>
+          <input id="username" name="username" placeholder="Your name / username" aria-label="Username">
+          <button id="setUsername" class="mini-button" type="button">Add</button>
         </div>
         <div id="usernameTagWrap" class="username-tag-wrap" hidden>
           <span id="usernameTag" class="username-tag"></span>

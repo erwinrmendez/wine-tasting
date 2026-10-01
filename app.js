@@ -97,6 +97,7 @@ function setSessionUsername(value) {
 function renderUsernameState() {
   const username = getSessionUsername();
   const showPrompt = !username;
+  form.hidden = !username;
   usernamePrompt.hidden = !showPrompt;
   usernameTagWrap.hidden = showPrompt;
   if (username) {
@@ -346,9 +347,17 @@ setUsernameButton.addEventListener("click", () => {
   usernameInput.value = "";
 });
 
+usernameInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    setUsernameButton.click();
+  }
+});
+
 editUsernameButton.addEventListener("click", () => {
   const username = getSessionUsername();
   usernameInput.value = username;
+  form.hidden = true;
   renderUsernameState();
   usernamePrompt.hidden = false;
   usernameTagWrap.hidden = true;
