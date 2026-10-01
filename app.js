@@ -48,6 +48,12 @@ const clearLocal = document.getElementById("clearLocal");
 const sortSavedCards = document.getElementById("sortSavedCards");
 const saveButton = document.querySelector(".save");
 const cancelEditButton = document.getElementById("cancelEdit");
+const usernameInput = document.getElementById("username");
+const usernameTag = document.getElementById("usernameTag");
+const usernamePrompt = document.getElementById("usernamePrompt");
+const usernameTagWrap = document.getElementById("usernameTagWrap");
+const setUsernameButton = document.getElementById("setUsername");
+const editUsernameButton = document.getElementById("editUsername");
 let editingCardId = null;
 
 DESCRIPTORS.forEach(text => {
@@ -76,6 +82,27 @@ function getLocalCards() {
     number: Number(card.number) || index + 1
   }));
 }
+function getSessionUsername() {
+  return localStorage.getItem("wineSessionUsername") || "";
+}
+function setSessionUsername(value) {
+  const username = value.trim();
+  if (!username) {
+    localStorage.removeItem("wineSessionUsername");
+    return "";
+  }
+  localStorage.setItem("wineSessionUsername", username);
+  return username;
+}
+function renderUsernameState() {
+  const username = getSessionUsername();
+  const showPrompt = !username;
+  usernamePrompt.hidden = !showPrompt;
+  usernameTagWrap.hidden = showPrompt;
+  if (username) {
+    usernameTag.textContent = `@${username}`;
+  }
+}
 function setLocalCards(cards) {
   localStorage.setItem("wineCards", JSON.stringify(cards));
 }
@@ -90,6 +117,7 @@ function resetFormState() {
   editingCardId = null;
   saveButton.textContent = "Save wine";
   cancelEditButton.hidden = true;
+  renderUsernameState();
 }
 function renderSummary() {
   const cards = getLocalCards();
@@ -215,7 +243,6 @@ function renderLocalCards() {
         const isActive = Number(g.dataset.value) <= Number(card.rating);
         g.classList.toggle("active", isActive);
       });
-      document.getElementById("username").value = card.username || "";
       document.getElementById("wineName").value = card.wineName || "";
       document.getElementById("broughtBy").value = card.broughtBy || "";
       document.getElementById("varietal").value = card.varietal || "";
@@ -250,6 +277,12 @@ form.addEventListener("submit", async event => {
     return;
   }
 
+  const sessionUsername = getSessionUsername();
+  if (!sessionUsername) {
+    status.textContent = "Set your username before saving a wine.";
+    return;
+  }
+
   const cards = getLocalCards();
   const existingCard = editingCardId ? cards.find(item => item.id === editingCardId) : null;
   const nextNumber = existingCard
@@ -260,7 +293,7 @@ form.addEventListener("submit", async event => {
     id: existingCard ? existingCard.id : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
     number: nextNumber,
     rating: Number(ratingValue.value),
-    username: document.getElementById("username").value.trim(),
+    username: sessionUsername,
     wineName: document.getElementById("wineName").value.trim(),
     varietal: document.getElementById("varietal").value.trim(),
     region: document.getElementById("region").value.trim(),
@@ -300,6 +333,26 @@ form.addEventListener("submit", async event => {
 
   resetFormState();
   status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
+});
+
+setUsernameButton.addEventListener("click", () => {
+  const username = setSessionUsername(usernameInput.value);
+  if (!username) {
+    status.textContent = "Enter a username to start saving cards.";
+    return;
+  }
+  status.textContent = `Username set to ${username} ✓`;
+  renderUsernameState();
+  usernameInput.value = "";
+});
+
+editUsernameButton.addEventListener("click", () => {
+  const username = getSessionUsername();
+  usernameInput.value = username;
+  renderUsernameState();
+  usernamePrompt.hidden = false;
+  usernameTagWrap.hidden = true;
+  usernameInput.focus();
 });
 
 cancelEditButton.addEventListener("click", cancelEdit);

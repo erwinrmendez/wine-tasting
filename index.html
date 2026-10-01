@@ -27,9 +27,16 @@
         <input type="hidden" id="ratingValue" name="rating" required>
       </section>
 
-      <section class="card">
-        <label for="username" class="section-label">Username for summary</label>
-        <input id="username" name="username" placeholder="Your name / username">
+      <section class="card" id="usernameSection">
+        <label class="section-label">Username</label>
+        <div id="usernamePrompt" class="username-prompt">
+          <input id="username" name="username" placeholder="Your name / username">
+          <button id="setUsername" class="mini-button" type="button">Use username</button>
+        </div>
+        <div id="usernameTagWrap" class="username-tag-wrap" hidden>
+          <span id="usernameTag" class="username-tag"></span>
+          <button id="editUsername" class="text-button small" type="button">Edit</button>
+        </div>
       </section>
 
       <section class="card">
