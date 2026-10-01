@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Wine Tasting Card</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="eyebrow">WINE TASTING</div>
+      <h1>Wine Card</h1>
+      <p>Rate it, describe it, and save your notes.</p>
+    </header>
+
+    <form id="wineForm" autocomplete="off">
+      <section class="card">
+        <label class="section-label">Rating</label>
+        <div class="glasses" id="rating" role="radiogroup" aria-label="Wine rating">
+          <button type="button" class="glass" data-value="1" aria-label="1 out of 5">🍷</button>
+          <button type="button" class="glass" data-value="2" aria-label="2 out of 5">🍷</button>
+          <button type="button" class="glass" data-value="3" aria-label="3 out of 5">🍷</button>
+          <button type="button" class="glass" data-value="4" aria-label="4 out of 5">🍷</button>
+          <button type="button" class="glass" data-value="5" aria-label="5 out of 5">🍷</button>
+        </div>
+        <input type="hidden" id="ratingValue" name="rating" required>
+      </section>
+
+      <section class="card">
+        <label for="broughtBy" class="section-label">Who brought it?</label>
+        <input id="broughtBy" name="broughtBy" placeholder="Name" required>
+      </section>
+
+      <section class="card">
+        <label for="goesWith" class="section-label">What goes with it?</label>
+        <input id="goesWith" name="goesWith" placeholder="Food / pairing">
+      </section>
+
+      <section class="card">
+        <div class="section-label">Describe the wine</div>
+        <p class="hint">Select all that apply</p>
+        <div class="chips" id="descriptors">
+          <!-- Edit these options in app.js -->
+        </div>
+      </section>
+
+      <section class="card">
+        <label for="notes" class="section-label">Notes</label>
+        <textarea id="notes" name="notes" rows="5" placeholder="Anything you noticed..."></textarea>
+      </section>
+
+      <button class="save" type="submit">Save wine</button>
+      <div id="status" class="status" aria-live="polite"></div>
+    </form>
+
+    <section class="saved card" id="savedSection">
+      <div class="saved-head">
+        <div>
+          <div class="section-label">Saved cards</div>
+          <p class="hint">On this device</p>
+        </div>
+        <button id="clearLocal" class="text-button" type="button">Clear</button>
+      </div>
+      <div id="savedCards"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
