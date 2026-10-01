@@ -14,6 +14,18 @@
       <p>Rate it, describe it, and save your notes.</p>
     </header>
 
+    <section class="card" id="usernameSection">
+      <label class="section-label">Username</label>
+      <div id="usernamePrompt" class="username-prompt">
+        <input id="username" name="username" placeholder="Your name / username" aria-label="Username">
+        <button id="setUsername" class="mini-button" type="button">Add</button>
+      </div>
+      <div id="usernameTagWrap" class="username-tag-wrap" hidden>
+        <span id="usernameTag" class="username-tag"></span>
+        <button id="editUsername" class="text-button small" type="button">Edit</button>
+      </div>
+    </section>
+
     <form id="wineForm" autocomplete="off" hidden>
       <section class="card">
         <label class="section-label">Rating</label>
@@ -25,18 +37,6 @@
           <button type="button" class="glass" data-value="5" aria-label="5 out of 5">🍷</button>
         </div>
         <input type="hidden" id="ratingValue" name="rating" required>
-      </section>
-
-      <section class="card" id="usernameSection">
-        <label class="section-label">Username</label>
-        <div id="usernamePrompt" class="username-prompt">
-          <input id="username" name="username" placeholder="Your name / username" aria-label="Username">
-          <button id="setUsername" class="mini-button" type="button">Add</button>
-        </div>
-        <div id="usernameTagWrap" class="username-tag-wrap" hidden>
-          <span id="usernameTag" class="username-tag"></span>
-          <button id="editUsername" class="text-button small" type="button">Edit</button>
-        </div>
       </section>
 
       <section class="card">
