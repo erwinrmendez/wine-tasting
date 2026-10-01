@@ -40,6 +40,7 @@ const status = document.getElementById("status");
 const descriptors = document.getElementById("descriptors");
 const savedCards = document.getElementById("savedCards");
 const clearLocal = document.getElementById("clearLocal");
+const sortSavedCards = document.getElementById("sortSavedCards");
 
 DESCRIPTORS.forEach(text => {
   const button = document.createElement("button");
@@ -73,7 +74,18 @@ function renderLocalCards() {
     savedCards.innerHTML = '<div class="empty">No cards saved on this device yet.</div>';
     return;
   }
-  savedCards.innerHTML = cards.slice().reverse().map(card => {
+
+  const sortedCards = [...cards].sort((a, b) => {
+    const order = sortSavedCards ? sortSavedCards.value : "newest";
+    if (order === "highest") return Number(b.rating) - Number(a.rating);
+    if (order === "lowest") return Number(a.rating) - Number(b.rating);
+
+    const aTime = new Date(a.createdAt || 0).getTime();
+    const bTime = new Date(b.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+  savedCards.innerHTML = sortedCards.map(card => {
     const wineName = card.wineName || card.broughtBy || "Untitled wine";
     return `
       <article class="saved-item">
@@ -138,6 +150,8 @@ form.addEventListener("submit", async event => {
   document.querySelectorAll(".glass").forEach(g => g.classList.remove("active"));
   document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
 });
+
+sortSavedCards.addEventListener("change", renderLocalCards);
 
 clearLocal.addEventListener("click", () => {
   if (confirm("Clear the wine cards saved on this device?")) {
