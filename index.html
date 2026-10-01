@@ -81,7 +81,10 @@
         <textarea id="notes" name="notes" rows="5" placeholder="Anything you noticed..."></textarea>
       </section>
 
-      <button class="save" type="submit">Save wine</button>
+      <div class="actions-row">
+        <button class="save" type="submit">Save wine</button>
+        <button id="cancelEdit" class="secondary-button" type="button" hidden>Cancel edit</button>
+      </div>
       <div id="status" class="status" aria-live="polite"></div>
     </form>
 

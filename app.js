@@ -46,6 +46,7 @@ const savedCards = document.getElementById("savedCards");
 const clearLocal = document.getElementById("clearLocal");
 const sortSavedCards = document.getElementById("sortSavedCards");
 const saveButton = document.querySelector(".save");
+const cancelEditButton = document.getElementById("cancelEdit");
 let editingCardId = null;
 
 DESCRIPTORS.forEach(text => {
@@ -87,11 +88,12 @@ function resetFormState() {
   document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
   editingCardId = null;
   saveButton.textContent = "Save wine";
+  cancelEditButton.hidden = true;
 }
 function renderLocalCards() {
   const cards = getLocalCards();
   if (!cards.length) {
-    savedCards.innerHTML = '<div class="empty">No cards saved on this device yet.</div>';
+    savedCards.innerHTML = '<div class="empty">No wines saved yet. Start tasting and save your first card.</div>';
     return;
   }
 
@@ -152,6 +154,7 @@ function renderLocalCards() {
 
       editingCardId = id;
       saveButton.textContent = "Update wine";
+      cancelEditButton.hidden = false;
       ratingValue.value = String(card.rating);
       document.querySelectorAll(".glass").forEach(g => {
         const isActive = Number(g.dataset.value) <= Number(card.rating);
@@ -172,6 +175,11 @@ function renderLocalCards() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
+}
+
+function cancelEdit() {
+  resetFormState();
+  status.textContent = "Edit cancelled.";
 }
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, c => ({
@@ -211,10 +219,10 @@ form.addEventListener("submit", async event => {
   let updatedCards;
   if (existingCard) {
     updatedCards = cards.map(item => item.id === existingCard.id ? card : item);
-    status.textContent = "Updated ✓";
+    status.textContent = "Updated successfully ✓";
   } else {
     updatedCards = [...cards, card];
-    status.textContent = "Saved on this device ✓";
+    status.textContent = "Saved successfully ✓";
   }
 
   setLocalCards(updatedCards);
@@ -224,7 +232,7 @@ form.addEventListener("submit", async event => {
   if (window.saveToCloud) {
     try {
       await window.saveToCloud(card);
-      status.textContent = existingCard ? "Updated ✓" : "Saved ✓";
+      status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
     } catch (err) {
       status.textContent = existingCard
         ? "Updated on this device, but cloud save failed."
@@ -234,8 +242,10 @@ form.addEventListener("submit", async event => {
   }
 
   resetFormState();
+  status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
 });
 
+cancelEditButton.addEventListener("click", cancelEdit);
 sortSavedCards.addEventListener("change", renderLocalCards);
 
 clearLocal.addEventListener("click", () => {
