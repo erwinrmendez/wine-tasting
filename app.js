@@ -4,8 +4,9 @@ const DESCRIPTORS = [
   "Earthy", "Spicy", "Oaky", "Vanilla", "Smoky",
   "Mineral", "Herbal", "Sweet", "Dry", "Tannic",
   "Acidic", "Light", "Medium-bodied", "Full-bodied",
-  "Smooth", "Crisp", "Rich", "Complex", "Fresh"
-];
+  "Smooth", "Crisp", "Rich", "Complex", "Fresh", "Is this gasoline?",
+  "Smells pretentious", "Notes of regret", "Tastes expensive"
+].sort(() => Math.random() - 0.5);
 
 
 // Optional central saving.
