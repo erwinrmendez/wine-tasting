@@ -13,6 +13,7 @@ const DESCRIPTORS = [
 // Create a Google Sheet + Apps Script endpoint as described in README.md,
 // then paste the deployed Web App URL here.
 const GOOGLE_SCRIPT_URL = "";
+const SESSIONS_KEY = "wineTastingSessions";
 
 window.saveToCloud = GOOGLE_SCRIPT_URL ? async function(card) {
   const body = new URLSearchParams({
@@ -36,13 +37,19 @@ window.saveToCloud = GOOGLE_SCRIPT_URL ? async function(card) {
 
 const form = document.getElementById("wineForm");
 const ratingValue = document.getElementById("ratingValue");
-const status = document.getElementById("status");
+const statusMessage = document.getElementById("status");
 const descriptors = document.getElementById("descriptors");
 const savedCards = document.getElementById("savedCards");
 const clearLocal = document.getElementById("clearLocal");
 const sortSavedCards = document.getElementById("sortSavedCards");
-const saveButton = document.querySelector(".save");
+const saveButton = document.querySelector("#wineForm .save");
 const cancelEditButton = document.getElementById("cancelEdit");
+const sessionHome = document.getElementById("sessionHome");
+const sessionHistory = document.getElementById("sessionHistory");
+const sessionList = document.getElementById("sessionList");
+const sessionWorkspace = document.getElementById("sessionWorkspace");
+const sessionTitle = document.getElementById("sessionTitle");
+let activeSessionId = null;
 let editingCardId = null;
 
 DESCRIPTORS.forEach(text => {
@@ -65,17 +72,75 @@ document.querySelectorAll(".glass").forEach(glass => {
   });
 });
 
+function createId() {
+  return window.crypto?.randomUUID?.() || String(Date.now());
+}
+function getSessions() {
+  const storedSessions = localStorage.getItem(SESSIONS_KEY);
+  if (storedSessions !== null) return JSON.parse(storedSessions);
+
+  const legacyCards = JSON.parse(localStorage.getItem("wineCards") || "[]");
+  const sessions = legacyCards.length ? [{
+    id: createId(),
+    name: "Previous tasting",
+    createdAt: legacyCards[0].createdAt || new Date().toISOString(),
+    cards: legacyCards
+  }] : [];
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+  if (legacyCards.length) localStorage.removeItem("wineCards");
+  return sessions;
+}
+function setSessions(sessions) {
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+}
 function getLocalCards() {
-  return JSON.parse(localStorage.getItem("wineCards") || "[]").map((card, index) => ({
+  const session = getSessions().find(item => item.id === activeSessionId);
+  return (session?.cards || []).map((card, index) => ({
     ...card,
     number: Number(card.number) || index + 1
   }));
 }
 function setLocalCards(cards) {
-  localStorage.setItem("wineCards", JSON.stringify(cards));
+  setSessions(getSessions().map(session =>
+    session.id === activeSessionId ? { ...session, cards } : session
+  ));
 }
-function reindexCardNumbers(cards) {
-  return cards.map((card, index) => ({ ...card, number: index + 1 }));
+function formatSessionDate(date) {
+  return new Date(date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+}
+function renderSessionHome() {
+  const sessions = getSessions().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  sessionHistory.hidden = sessions.length === 0;
+  sessionList.innerHTML = sessions.map(session => `
+    <div class="session-entry">
+      <button type="button" class="session-item" data-session-id="${escapeHtml(session.id)}">
+        <span class="session-item-name">${escapeHtml(session.name)}</span>
+        <span class="session-item-meta">${formatSessionDate(session.createdAt)} · ${(session.cards || []).length} wines</span>
+      </button>
+      <button type="button" class="session-delete" data-session-id="${escapeHtml(session.id)}" aria-label="Delete ${escapeHtml(session.name)}">Delete</button>
+    </div>
+  `).join("");
+  sessionList.querySelectorAll(".session-item").forEach(button => {
+    button.addEventListener("click", () => openSession(button.dataset.sessionId));
+  });
+  sessionList.querySelectorAll(".session-delete").forEach(button => {
+    button.addEventListener("click", () => {
+      const session = getSessions().find(item => item.id === button.dataset.sessionId);
+      if (!session || !confirm(`Delete "${session.name}" and all its wine cards? This cannot be undone.`)) return;
+      setSessions(getSessions().filter(item => item.id !== session.id));
+      renderSessionHome();
+    });
+  });
+}
+function openSession(id) {
+  const session = getSessions().find(item => item.id === id);
+  if (!session) return;
+  activeSessionId = id;
+  sessionTitle.textContent = session.name;
+  sessionHome.hidden = true;
+  sessionWorkspace.hidden = false;
+  resetFormState();
+  renderLocalCards();
 }
 function resetFormState() {
   form.reset();
@@ -134,12 +199,12 @@ function renderLocalCards() {
 
       if (action === "delete") {
         const filtered = cards.filter(item => item.id !== id);
-        setLocalCards(reindexCardNumbers(filtered));
+        setLocalCards(filtered.map((item, index) => ({ ...item, number: index + 1 })));
         renderLocalCards();
         if (editingCardId === id) {
           resetFormState();
         }
-        status.textContent = "Wine card deleted.";
+        statusMessage.textContent = "Wine card deleted.";
         return;
       }
 
@@ -158,7 +223,7 @@ function renderLocalCards() {
       document.querySelectorAll(".chip").forEach(chip => {
         chip.classList.toggle("selected", (card.descriptors || []).includes(chip.dataset.value));
       });
-      status.textContent = `Editing wine #${card.number}`;
+      statusMessage.textContent = `Editing wine #${card.number}`;
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
@@ -166,7 +231,7 @@ function renderLocalCards() {
 
 function cancelEdit() {
   resetFormState();
-  status.textContent = "Edit cancelled.";
+  statusMessage.textContent = "Edit cancelled.";
 }
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, c => ({
@@ -177,7 +242,7 @@ function escapeHtml(value) {
 form.addEventListener("submit", async event => {
   event.preventDefault();
   if (!ratingValue.value) {
-    status.textContent = "Choose a rating first.";
+    statusMessage.textContent = "Choose a rating first.";
     return;
   }
 
@@ -188,7 +253,7 @@ form.addEventListener("submit", async event => {
     : cards.reduce((max, card) => Math.max(max, Number(card.number) || 0), 0) + 1;
 
   const card = {
-    id: existingCard ? existingCard.id : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+    id: existingCard ? existingCard.id : createId(),
     number: nextNumber,
     rating: Number(ratingValue.value),
     category: document.getElementById("category").value,
@@ -202,10 +267,10 @@ form.addEventListener("submit", async event => {
   let updatedCards;
   if (existingCard) {
     updatedCards = cards.map(item => item.id === existingCard.id ? card : item);
-    status.textContent = "Updated successfully ✓";
+    statusMessage.textContent = "Updated successfully ✓";
   } else {
     updatedCards = [...cards, card];
-    status.textContent = "Saved successfully ✓";
+    statusMessage.textContent = "Saved successfully ✓";
   }
 
   setLocalCards(updatedCards);
@@ -215,9 +280,9 @@ form.addEventListener("submit", async event => {
   if (window.saveToCloud) {
     try {
       await window.saveToCloud(card);
-      status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
+      statusMessage.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
     } catch (err) {
-      status.textContent = existingCard
+      statusMessage.textContent = existingCard
         ? "Updated on this device, but cloud save failed."
         : "Saved on this device, but cloud save failed.";
       console.error(err);
@@ -225,18 +290,36 @@ form.addEventListener("submit", async event => {
   }
 
   resetFormState();
-  status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
+  statusMessage.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
 });
 
 cancelEditButton.addEventListener("click", cancelEdit);
 sortSavedCards.addEventListener("change", renderLocalCards);
 
 clearLocal.addEventListener("click", () => {
-  if (confirm("Clear the wine cards saved on this device?")) {
-    localStorage.removeItem("wineCards");
-    resetFormState();
-    renderLocalCards();
-  }
+  if (!confirm("Clear the wine cards in this tasting?")) return;
+  setLocalCards([]);
+  resetFormState();
+  renderLocalCards();
 });
 
-renderLocalCards();
+document.getElementById("startSession").addEventListener("click", () => {
+  const createdAt = new Date().toISOString();
+  const session = {
+    id: createId(),
+    name: `Tasting - ${formatSessionDate(createdAt)}`,
+    createdAt,
+    cards: []
+  };
+  setSessions([...getSessions(), session]);
+  openSession(session.id);
+});
+document.getElementById("backToSessions").addEventListener("click", () => {
+  resetFormState();
+  activeSessionId = null;
+  sessionWorkspace.hidden = true;
+  sessionHome.hidden = false;
+  renderSessionHome();
+});
+
+renderSessionHome();

@@ -10,9 +10,22 @@
   <main class="app">
     <header>
       <div class="eyebrow">WINE TASTING</div>
-      <h1>Wine Card</h1>
-      <p>Rate it, describe it, and save your notes.</p>
+      <h1>Wine Tasting</h1>
     </header>
+
+    <section id="sessionHome" class="session-home">
+      <button id="startSession" class="save" type="button">Start tasting</button>
+      <div id="sessionHistory" hidden>
+        <div class="section-label">Previous tastings</div>
+        <div id="sessionList"></div>
+      </div>
+    </section>
+
+    <section id="sessionWorkspace" hidden>
+      <div class="session-bar">
+        <button id="backToSessions" class="text-button" type="button">All tastings</button>
+        <div id="sessionTitle" class="session-title"></div>
+      </div>
 
     <form id="wineForm" autocomplete="off">
       <section class="card">
@@ -85,6 +98,7 @@
         </select>
       </div>
       <div id="savedCards"></div>
+    </section>
     </section>
 
   </main>

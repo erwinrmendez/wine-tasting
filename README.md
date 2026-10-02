@@ -5,6 +5,8 @@ A mobile-first web app for a wine tasting night.
 ## What it does
 
 - One card per wine
+- Multiple tasting sessions, each with its own saved wine cards
+- Browse previous tastings saved on this device
 - 1–5 wine-glass rating
 - Who brought it?
 - What goes with it?
