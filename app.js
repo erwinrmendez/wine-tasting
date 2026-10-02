@@ -50,6 +50,7 @@ const usernamePrompt = document.getElementById("usernamePrompt");
 const usernameTagWrap = document.getElementById("usernameTagWrap");
 const setUsernameButton = document.getElementById("setUsername");
 const editUsernameButton = document.getElementById("editUsername");
+const USERNAME_STORAGE_KEY = "wineUsername";
 let editingCardId = null;
 let editingUsername = false;
 
@@ -80,15 +81,23 @@ function getLocalCards() {
   }));
 }
 function getSessionUsername() {
-  return localStorage.getItem("wineSessionUsername") || "";
+  const storedUsername = localStorage.getItem(USERNAME_STORAGE_KEY);
+  if (storedUsername) {
+    return storedUsername;
+  }
+
+  const previousCardUsername = getLocalCards().slice().reverse().find(card => card.username)?.username || "";
+  if (previousCardUsername) {
+    localStorage.setItem(USERNAME_STORAGE_KEY, previousCardUsername);
+  }
+  return previousCardUsername;
 }
 function setSessionUsername(value) {
   const username = value.trim();
   if (!username) {
-    localStorage.removeItem("wineSessionUsername");
     return "";
   }
-  localStorage.setItem("wineSessionUsername", username);
+  localStorage.setItem(USERNAME_STORAGE_KEY, username);
   return username;
 }
 function renderUsernameState() {
