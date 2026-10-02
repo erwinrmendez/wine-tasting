@@ -43,15 +43,7 @@ const clearLocal = document.getElementById("clearLocal");
 const sortSavedCards = document.getElementById("sortSavedCards");
 const saveButton = document.querySelector(".save");
 const cancelEditButton = document.getElementById("cancelEdit");
-const usernameInput = document.getElementById("username");
-const usernameTag = document.getElementById("usernameTag");
-const usernamePrompt = document.getElementById("usernamePrompt");
-const usernameTagWrap = document.getElementById("usernameTagWrap");
-const setUsernameButton = document.getElementById("setUsername");
-const editUsernameButton = document.getElementById("editUsername");
-const USERNAME_STORAGE_KEY = "wineUsername";
 let editingCardId = null;
-let editingUsername = false;
 
 DESCRIPTORS.forEach(text => {
   const button = document.createElement("button");
@@ -79,36 +71,6 @@ function getLocalCards() {
     number: Number(card.number) || index + 1
   }));
 }
-function getSessionUsername() {
-  const storedUsername = localStorage.getItem(USERNAME_STORAGE_KEY);
-  if (storedUsername) {
-    return storedUsername;
-  }
-
-  const previousCardUsername = getLocalCards().slice().reverse().find(card => card.username)?.username || "";
-  if (previousCardUsername) {
-    localStorage.setItem(USERNAME_STORAGE_KEY, previousCardUsername);
-  }
-  return previousCardUsername;
-}
-function setSessionUsername(value) {
-  const username = value.trim();
-  if (!username) {
-    return "";
-  }
-  localStorage.setItem(USERNAME_STORAGE_KEY, username);
-  return username;
-}
-function renderUsernameState() {
-  const username = getSessionUsername();
-  const showPrompt = !username || editingUsername;
-  form.hidden = !username || editingUsername;
-  usernamePrompt.hidden = !showPrompt;
-  usernameTagWrap.hidden = !username || editingUsername;
-  if (username) {
-    usernameTag.textContent = `@${username}`;
-  }
-}
 function setLocalCards(cards) {
   localStorage.setItem("wineCards", JSON.stringify(cards));
 }
@@ -123,7 +85,6 @@ function resetFormState() {
   editingCardId = null;
   saveButton.textContent = "Save wine";
   cancelEditButton.hidden = true;
-  renderUsernameState();
 }
 function renderLocalCards() {
   const cards = getLocalCards();
@@ -150,7 +111,6 @@ function renderLocalCards() {
           <span>${"🍷".repeat(card.rating)}</span>
         </div>
         <div class="saved-meta">
-          ${card.username ? `Username: ${escapeHtml(card.username)}<br>` : ""}
           ${card.category ? `Category: ${escapeHtml(card.category)}<br>` : ""}
           ${card.broughtBy ? `Brought by: ${escapeHtml(card.broughtBy)}<br>` : ""}
           ${card.goesWith ? `Goes with: ${escapeHtml(card.goesWith)}<br>` : ""}
@@ -221,12 +181,6 @@ form.addEventListener("submit", async event => {
     return;
   }
 
-  const sessionUsername = getSessionUsername();
-  if (!sessionUsername) {
-    status.textContent = "Set your username before saving a wine.";
-    return;
-  }
-
   const cards = getLocalCards();
   const existingCard = editingCardId ? cards.find(item => item.id === editingCardId) : null;
   const nextNumber = existingCard
@@ -237,7 +191,6 @@ form.addEventListener("submit", async event => {
     id: existingCard ? existingCard.id : (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
     number: nextNumber,
     rating: Number(ratingValue.value),
-    username: sessionUsername,
     category: document.getElementById("category").value,
     broughtBy: document.getElementById("broughtBy").value.trim(),
     goesWith: document.getElementById("goesWith").value.trim(),
@@ -275,33 +228,6 @@ form.addEventListener("submit", async event => {
   status.textContent = existingCard ? "Updated successfully ✓" : "Saved successfully ✓";
 });
 
-setUsernameButton.addEventListener("click", () => {
-  const username = setSessionUsername(usernameInput.value);
-  if (!username) {
-    status.textContent = "Enter a username to start saving cards.";
-    return;
-  }
-  editingUsername = false;
-  status.textContent = `Username set to ${username} ✓`;
-  renderUsernameState();
-  usernameInput.value = "";
-});
-
-usernameInput.addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    setUsernameButton.click();
-  }
-});
-
-editUsernameButton.addEventListener("click", () => {
-  const username = getSessionUsername();
-  usernameInput.value = username;
-  editingUsername = true;
-  renderUsernameState();
-  usernameInput.focus();
-});
-
 cancelEditButton.addEventListener("click", cancelEdit);
 sortSavedCards.addEventListener("change", renderLocalCards);
 
@@ -313,5 +239,4 @@ clearLocal.addEventListener("click", () => {
   }
 });
 
-renderUsernameState();
 renderLocalCards();

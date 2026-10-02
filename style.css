@@ -60,18 +60,7 @@ select { appearance:none; }
 }
 .save:active, .secondary-button:active { transform:translateY(1px); }
 .status { min-height:22px; text-align:center; color:var(--muted); font-size:.85rem; }
-.username-prompt { display:flex; gap:10px; align-items:center; }
-.username-tag-wrap { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.username-tag {
-  display:inline-flex; align-items:center; border-radius:999px; background:var(--accent-soft);
-  color:var(--accent); padding:7px 12px; font-weight:700; font-size:.82rem;
-}
-.mini-button {
-  border:0; border-radius:12px; background:var(--accent); color:#fff;
-  padding:11px 14px; font:inherit; font-weight:700; cursor:pointer;
-}
 .text-button { border:0; background:none; color:var(--accent); font:inherit; cursor:pointer; }
-.text-button.small { font-size:.8rem; }
 .saved-head { display:flex; align-items:center; justify-content:space-between; }
 .saved-toolbar { display:flex; align-items:center; gap:10px; margin:10px 0 8px; }
 .saved-toolbar .section-label { margin:0; }
