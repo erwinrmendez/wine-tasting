@@ -39,7 +39,6 @@ const ratingValue = document.getElementById("ratingValue");
 const status = document.getElementById("status");
 const descriptors = document.getElementById("descriptors");
 const savedCards = document.getElementById("savedCards");
-const summary = document.getElementById("summary");
 const clearLocal = document.getElementById("clearLocal");
 const sortSavedCards = document.getElementById("sortSavedCards");
 const saveButton = document.querySelector(".save");
@@ -126,65 +125,12 @@ function resetFormState() {
   cancelEditButton.hidden = true;
   renderUsernameState();
 }
-function renderSummary() {
-  const cards = getLocalCards();
-  if (!cards.length) {
-    summary.innerHTML = '<div class="empty">No summary yet. Save a few wines to see the tasting results.</div>';
-    return;
-  }
-
-  const sortedCards = [...cards].sort((a, b) => Number(b.rating) - Number(a.rating));
-  const topWine = sortedCards[0];
-  const leaderboard = Object.values(cards.reduce((acc, card) => {
-    const username = (card.username || "Anonymous").trim() || "Anonymous";
-    if (!acc[username]) {
-      acc[username] = { username, total: 0, count: 0 };
-    }
-    acc[username].total += Number(card.rating);
-    acc[username].count += 1;
-    return acc;
-  }, {})).sort((a, b) => {
-    const avgB = b.total / b.count;
-    const avgA = a.total / a.count;
-    return avgB - avgA || b.count - a.count;
-  });
-
-  const avgRating = cards.reduce((total, card) => total + Number(card.rating), 0) / cards.length;
-
-  summary.innerHTML = `
-    <div class="summary-grid">
-      <div class="summary-item">
-        <div class="summary-label">Top wine</div>
-        <div class="summary-value">Wine #${topWine.number}</div>
-        <div class="summary-subtle">${"🍷".repeat(topWine.rating)}</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-label">Average rating</div>
-        <div class="summary-value">${avgRating.toFixed(1)} / 5</div>
-        <div class="summary-subtle">Across ${cards.length} wines</div>
-      </div>
-    </div>
-    <div class="leaderboard">
-      <div class="summary-label">Leaderboard by username</div>
-      ${leaderboard.map((entry, index) => `
-        <div class="leaderboard-row">
-          <span>#${index + 1} ${escapeHtml(entry.username)}</span>
-          <strong>${(entry.total / entry.count).toFixed(1)} avg</strong>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
 function renderLocalCards() {
   const cards = getLocalCards();
   if (!cards.length) {
     savedCards.innerHTML = '<div class="empty">No wines saved yet. Start tasting and save your first card.</div>';
-    renderSummary();
     return;
   }
-
-  renderSummary();
 
   const sortedCards = [...cards].sort((a, b) => {
     const order = sortSavedCards ? sortSavedCards.value : "newest";
