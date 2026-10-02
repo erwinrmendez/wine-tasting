@@ -1,11 +1,13 @@
 // Wine descriptors — edit this list to match your tasting.
 const DESCRIPTORS = [
-  "Fruity", "Floral", "Citrusy", "Tropical", "Berry",
-  "Earthy", "Spicy", "Oaky", "Vanilla", "Smoky",
-  "Mineral", "Herbal", "Sweet", "Dry", "Tannic",
-  "Acidic", "Light", "Medium-bodied", "Full-bodied",
-  "Smooth", "Crisp", "Rich", "Complex", "Fresh", "Is this gasoline?",
-  "Smells pretentious", "Notes of regret", "Tastes expensive"
+  "Ace in a glass", "Acidic", "Aggressively mediocre", "Balanced", "Berry",
+  "Bold", "Boxed wine energy", "Bubbly", "Coach's disappointment", "Citrusy",
+  "Complex", "Crisp", "Dry", "Earthy", "Expensive", "Floral", "Fresh",
+  "Fruity", "Full-bodied", "Headache", "Herbal", "Is this gasoline?", "Light",
+  "Medium-bodied", "Mineral", "Needs a bigger glass", "Oaky", "Questionable choices",
+  "Refreshing", "Regrets", "Rich", "Rotation error", "Smells pretentious", "Smooth",
+  "Smoky", "Spicy", "Strong serve", "Sweet", "Tannic", "Tastes expensive",
+  "Tropical", "Vanilla", "Zingy"
 ].sort(() => Math.random() - 0.5);
 
 
