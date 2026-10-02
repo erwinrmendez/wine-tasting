@@ -18,10 +18,6 @@ window.saveToCloud = GOOGLE_SCRIPT_URL ? async function(card) {
   const body = new URLSearchParams({
     id: card.id,
     rating: String(card.rating),
-    wineName: card.wineName,
-    varietal: card.varietal,
-    region: card.region,
-    vintage: card.vintage,
     category: card.category,
     broughtBy: card.broughtBy,
     goesWith: card.goesWith,
@@ -151,7 +147,7 @@ function renderSummary() {
       <div class="summary-item">
         <div class="summary-label">Top wine</div>
         <div class="summary-value">Wine #${topWine.number}</div>
-        <div class="summary-subtle">${escapeHtml(topWine.wineName || "Untitled wine")} · ${"🍷".repeat(topWine.rating)}</div>
+        <div class="summary-subtle">${"🍷".repeat(topWine.rating)}</div>
       </div>
       <div class="summary-item">
         <div class="summary-label">Average rating</div>
@@ -192,7 +188,6 @@ function renderLocalCards() {
   });
 
   savedCards.innerHTML = sortedCards.map(card => {
-    const wineName = card.wineName || "Untitled wine";
     return `
       <article class="saved-item">
         <div class="saved-title">
@@ -201,10 +196,6 @@ function renderLocalCards() {
         </div>
         <div class="saved-meta">
           ${card.username ? `Username: ${escapeHtml(card.username)}<br>` : ""}
-          ${wineName ? `Wine: ${escapeHtml(wineName)}<br>` : ""}
-          ${card.varietal ? `Varietal: ${escapeHtml(card.varietal)}<br>` : ""}
-          ${card.region ? `Region: ${escapeHtml(card.region)}<br>` : ""}
-          ${card.vintage ? `Vintage: ${escapeHtml(card.vintage)}<br>` : ""}
           ${card.category ? `Category: ${escapeHtml(card.category)}<br>` : ""}
           ${card.broughtBy ? `Brought by: ${escapeHtml(card.broughtBy)}<br>` : ""}
           ${card.goesWith ? `Goes with: ${escapeHtml(card.goesWith)}<br>` : ""}
@@ -245,11 +236,7 @@ function renderLocalCards() {
         const isActive = Number(g.dataset.value) <= Number(card.rating);
         g.classList.toggle("active", isActive);
       });
-      document.getElementById("wineName").value = card.wineName || "";
       document.getElementById("broughtBy").value = card.broughtBy || "";
-      document.getElementById("varietal").value = card.varietal || "";
-      document.getElementById("region").value = card.region || "";
-      document.getElementById("vintage").value = card.vintage || "";
       document.getElementById("category").value = card.category || "";
       document.getElementById("goesWith").value = card.goesWith || "";
       document.getElementById("notes").value = card.notes || "";
@@ -296,10 +283,6 @@ form.addEventListener("submit", async event => {
     number: nextNumber,
     rating: Number(ratingValue.value),
     username: sessionUsername,
-    wineName: document.getElementById("wineName").value.trim(),
-    varietal: document.getElementById("varietal").value.trim(),
-    region: document.getElementById("region").value.trim(),
-    vintage: document.getElementById("vintage").value.trim(),
     category: document.getElementById("category").value,
     broughtBy: document.getElementById("broughtBy").value.trim(),
     goesWith: document.getElementById("goesWith").value.trim(),
